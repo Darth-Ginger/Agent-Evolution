@@ -1,0 +1,42 @@
+global:
+  scrape_interval: 15s # How often to scrape targets by default
+  evaluation_interval: 15s # How often to evaluate rules
+
+scrape_configs:
+  # Monitor Prometheus itself
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"] # Prometheus runs on port 9090 in the container
+
+  # Monitor the Primary API
+  - job_name: "primary_api"
+    static_configs:
+      - targets: ["primary_api:8000"]
+
+  # Monitor the Evolving API
+  - job_name: "evolving_api"
+    static_configs:
+      - targets: ["evolving_api:8001"]
+
+  # Monitor RabbitMQ
+  - job_name: "message_broker"
+    static_configs:
+      - targets: ["message_broker:15672"] # RabbitMQ Management Plugin
+
+  # Monitor the Agents
+  - job_name: "coding_agent"
+    static_configs:
+      - targets: ["coding_agent:8002"]
+
+  - job_name: "research_agent"
+    static_configs:
+      - targets: ["research_agent:8003"]
+
+  - job_name: "planner_agent"
+    static_configs:
+      - targets: ["planner_agent:8004"]
+
+  # (Optional) Monitor Host System Using Node Exporter
+  - job_name: "node_exporter"
+    static_configs:
+      - targets: ["node_exporter:9100"]
