@@ -1,0 +1,18 @@
+# Ignore files
+*.egg
+*.egg-info
+dist
+build
+.tox
+.nox
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.egg
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+#ssh_keys
+ssh_keys/
