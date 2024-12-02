@@ -3,7 +3,7 @@ import re
 from pydantic import BaseModel, Field, model_validator
 from typing import Dict, Literal, Optional
 
-from primary_api.db.neo4j import get_neo4j_driver
+from ..db.neo4j import get_neo4j_driver
 from ..db.NodeManager import NodeManager
 
 Manager = NodeManager(get_neo4j_driver())
