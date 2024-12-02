@@ -1,12 +1,10 @@
 from enum import Enum
 import re
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, ValidationError, model_validator
 from typing import Dict, Literal, Optional
 
 from ..db.neo4j import get_like_nodes, get_neo4j_driver
-# from ..db.NodeManager import NodeManager
 
-# Manager = NodeManager(get_neo4j_driver())
 
 class CypherQuery(BaseModel):
     query: str
@@ -21,7 +19,7 @@ class Relationship(BaseModel):
     created_at: Optional[str] = None  # ISO 8601 timestamp
 
 class NodeBase(BaseModel):
-    name: str = Field(default_factory=str, description="Human readable name for Node")
+    name: str = Field(..., description="Human readable name for Node")
     id: Optional[str] = None
     description: Optional[str] = None
 
@@ -34,7 +32,7 @@ class NodeBase(BaseModel):
     def generate_id(cls, values):
         if not values.get('id'):
             # Generate ID by converting name
-            base_id = re.sub(r"\s+", "_", values["name"].lower())
+            base_id = re.sub(r"\W+", "_", values["name"].strip().lower())
             values["id"] = base_id
             
             existing_ids = cls.check_existing_ids(base_id)
@@ -66,6 +64,19 @@ class TaskStatus(str, Enum):
 class Task(NodeBase):
     status: TaskStatus = TaskStatus.UNASSIGNED # Default Status
     asignee: Optional[Agent] = None
+    
+    @model_validator(mode="before")
+    @classmethod
+    def aut_update_status(cls, values):
+        if values.get("assignee") and values.get("status") == TaskStatus.UNASSIGNED:
+            values["status"] = TaskStatus.ASSIGNED
+        return values
+    
+    @model_validator(mode="after")
+    def validate_status(self):
+        if self.status in {TaskStatus.ASSIGNED, TaskStatus.IN_PROGRESS, TaskStatus.COMPLETED} and not self.assignee:
+            raise ValidationError(f"Cannot set status to {self.status} without an assignee.")
+        return self
     
 class Capability(NodeBase):
     valid_relationships: list[str] = Field(default_factory=list, description="List of valid relationships for this capability", examples=["ASSIGNED_TO", "CAN_EXECUTE", "USES"])
