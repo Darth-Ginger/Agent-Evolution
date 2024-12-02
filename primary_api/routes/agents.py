@@ -1,7 +1,10 @@
 from fastapi import APIRouter, HTTPException
+from typing import List
 from prometheus_client import Counter
-from ..models.models import Agent, AgentUpdate
-from ..db.neo4j import get_neo4j_driver, node_exists
+
+from ..db.NodeManager import NodeManager
+from ..db.neo4j import get_neo4j_driver
+from ..models.models import Agent, NodeUpdate
 
 # Initialize the APIRouter
 router = APIRouter()
@@ -10,167 +13,66 @@ router = APIRouter()
 agent_creation_counter = Counter("agent_creation_count", "Number of agents")
 agent_deletion_counter = Counter("agent_deletion_count", "Number of agents")
 
+# Neo4j driver (replace with your driver instance)
+driver = get_neo4j_driver()
+# Instantiate the NodeManager
+manager = NodeManager(driver)
+
 # Create
-@router.post("/")
-async def create_agent(agent: Agent):
+@router.post("/", response_model=Agent)
+async def create_agent(data: Agent):
     """
-    Create an agent in Neo4j.
+    Create a new agent.
     """
-    driver = get_neo4j_driver()
-    with driver.session() as session:
-        # Check if the agent already exists
-        if node_exists("Agent", "id", agent.id):
-            raise HTTPException(status_code=400, detail="Agent already exists.")
-
-        agent_creation_counter.inc()
-        # Create the agent node
-        session.run(
-            """
-            CREATE (a:Agent {id: $id, name: $name, base_prompt: $base_prompt})
-            """,
-            {"id": agent.id, "name": agent.name, "base_prompt": agent.base_prompt}
-        )
-
-        # Add capabilities as relationships
-        for capability_name in agent.capabilities:
-            capability_id = capability_name.replace(" ", "_")
-            session.run(
-                """
-                MERGE (c:Capability {id: $capability_id, name: $capability_name})
-                MATCH (a:Agent {id: $id})
-                MERGE (a)-[:CAN_EXECUTE]->(c)
-                """,
-                {"capability_id": capability_id, "capability_name": capability_name, "id": agent.id}
-            )
-    return {"message": "Agent created successfully"}
+    result = manager.create_node("Agent", data)
+    if not result:
+        raise HTTPException(status_code=400, detail="Failed to create agent")
+    # Add capabilities as relationships
+    for capability_name in data.capabilities:
+        capability_id = capability_name.replace(" ", "_")
+        manager.create_relationship("Agent", data.id, "Capability", capability_id, capability_name)
+    return {"Agent created successfully": data}
 
 # Read
-@router.get("/")
-async def get_agents():
+@router.get("/", response_model=List[Agent])
+async def get_agents() -> List[Agent]:
     """
-    List all agents.
+    Get all agents.
     """
-    driver = get_neo4j_driver()
-    with driver.session() as session:
-        result = session.run("MATCH (a:Agent) RETURN a.id AS id, a.name AS name")
-        agents = [{"id": record["id"], "name": record["name"]} for record in result]
-    return {"agents": agents}
+    agents = manager.get_nodes("Agent")
+    return [Agent(**agent["n"]) for agent in agents]
 
-@router.get("/{agent_id}")
-async def get_agent(agent_id: str):
+@router.get("/{agent_id}", response_model=Agent)
+async def get_agent(agent_id: str) -> Agent:
     """
     Get an agent by ID.
     """
-    driver = get_neo4j_driver()
-    with driver.session() as session:
-        result = session.run("MATCH (a:Agent {id: $id}) RETURN a.id AS id, a.name AS name", {"id": agent_id})
-        agent = result.single()
-        if not agent:
-            raise HTTPException(status_code=404, detail="Agent not found.")
-        return {"id": agent["id"], "name": agent["name"]}
+    agent = manager.get_node("Agent", agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found.")
+    return Agent(**agent["n"])
 
 # Update
-@router.put("/{agent_id}", 
-            summary="Update an agent", 
-            description="Update agent details, including name, base_prompt, \
-                            and capabilities. Supports operations to overwrite, \
-                            append, or remove capabilities.")
-async def update_agent(agent_id: str, update: AgentUpdate):
+@router.put("/{agent_id}", response_model=Agent)
+async def update_agent(agent_id: str, update: NodeUpdate) -> dict:
     """
     Update an agent's properties based on the provided partial body.
 
     - **name**: Optional new name for the agent.
     - **base_prompt**: Optional new base prompt for the agent.
     - **capabilities**: List of capabilities to modify.
-    - **capabilities_operation**: Determines how to handle capabilities:
+    - **operation**: Determines how to handle capabilities:
         - `overwrite`: Replace existing capabilities with the provided list.
         - `append`: Add the provided capabilities to the existing ones.
         - `remove`: Remove the provided capabilities from the existing ones.
     """
-    driver = get_neo4j_driver()
-    with driver.session() as session:
-        # Check if the agent exists
-        agent = session.run("MATCH (a:Agent {id: $id}) RETURN a", {"id": agent_id}).single()
-        if not agent:
-            raise HTTPException(status_code=404, detail="Agent not found.")
-        
-        # Build the Cypher SET statement dynamically based on provided fields
-        updates = []
-        parameters = {"id": agent_id}
-        if update.name is not None:
-            updates.append("a.name = $name")
-            parameters["name"] = update.name
-        if update.base_prompt is not None:
-            updates.append("a.base_prompt = $base_prompt")
-            parameters["base_prompt"] = update.base_prompt
-
-        # Handle capabilities based on the operation type
-        if update.capabilities is not None:
-            if update.capabilities_operation == "overwrite":
-                # Remove existing capabilities and replace with the new list
-                session.run(
-                    """
-                    MATCH (a:Agent {id: $id})-[r:CAN_EXECUTE]->()
-                    DELETE r
-                    """,
-                    {"id": agent_id}
-                )
-                for capability_name in update.capabilities:
-                    capability_id = capability_name.replace(" ", "_")
-                    session.run(
-                        """
-                        MERGE (c:Capability {id: $capability_id, name: $capability_name})
-                        MATCH (a:Agent {id: $id})
-                        MERGE (a)-[:CAN_EXECUTE]->(c)
-                        """,
-                        {"capability_id": capability_id, "capability_name": capability_name, "id": agent_id}
-                    )
-
-            elif update.capabilities_operation == "append":
-                # Add the new capabilities without removing existing ones
-                for capability_name in update.capabilities:
-                    capability_id = capability_name.replace(" ", "_")
-                    session.run(
-                        """
-                        MERGE (c:Capability {id: $capability_id, name: $capability_name})
-                        MATCH (a:Agent {id: $id})
-                        MERGE (a)-[:CAN_EXECUTE]->(c)
-                        """,
-                        {"capability_id": capability_id, "capability_name": capability_name, "id": agent_id}
-                    )
-
-            elif update.capabilities_operation == "remove":
-                # Remove the specified capabilities
-                for capability_name in update.capabilities:
-                    capability_id = capability_name.replace(" ", "_")
-                    session.run(
-                        """
-                        MATCH (a:Agent {id: $id})-[r:CAN_EXECUTE]->(c:Capability {id: $capability_id})
-                        DELETE r
-                        """,
-                        {"id": agent_id, "capability_id": capability_id}
-                    )
-
-        # Execute updates for name and base_prompt
-        if updates:
-            query = f"""
-                MATCH (a:Agent {{id: $id}})
-                SET {', '.join(updates)}
-            """
-            session.run(query, parameters)
-
-    return {"message": "Agent updated successfully"}
+    agent = manager.update_node("Agent", agent_id, update.updates, update.operation)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found.")
+    return {"Agent updated successfully": agent}
 
 # Delete
 @router.delete("/{agent_id}")
-async def delete_agent(agent_id: str):
-    # Check if the agent exists
-    if not node_exists("Agent", "id", agent_id):
-        raise HTTPException(status_code=404, detail="Agent not found.")
-    
-    agent_deletion_counter.inc()
-    driver = get_neo4j_driver()
-    with driver.session() as session:
-        # Delete the agent
-        session.run("MATCH (a:Agent {id: $id}) DETACH DELETE a", {"id": agent_id})
-    return {"message": "Agent deleted successfully"}
+async def delete_agent(agent_id: str) -> dict:
+    manager.delete_node("Agent", agent_id)
+    return {"message": "Agent deleted"}

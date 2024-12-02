@@ -23,3 +23,4 @@ def node_exists(label: str, property_name: str, property_value: str) -> bool:
     with driver.session() as session:
         result = session.run(query, {"value": property_value})
         return result.single() is not None
+    
