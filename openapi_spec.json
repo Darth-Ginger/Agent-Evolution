@@ -1,1 +1,770 @@
-{"openapi":"3.1.0","info":{"title":"FastAPI","version":"0.1.0"},"paths":{"/metrics":{"get":{"summary":"Metrics","description":"Endpoint that serves Prometheus metrics.","operationId":"metrics_metrics_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}},"/tasks/":{"get":{"tags":["Tasks"],"summary":"Get Tasks","operationId":"get_tasks_tasks__get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"items":{"$ref":"#/components/schemas/Task"},"type":"array","title":"Response Get Tasks Tasks  Get"}}}}}},"post":{"tags":["Tasks"],"summary":"Create Task","operationId":"create_task_tasks__post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Task"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Task"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/tasks/{task_id}":{"get":{"tags":["Tasks"],"summary":"Get Task","description":"Get a specific task by ID.","operationId":"get_task_tasks__task_id__get","parameters":[{"name":"task_id","in":"path","required":true,"schema":{"type":"string","title":"Task Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Task"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"put":{"tags":["Tasks"],"summary":"Update Task","description":"Update an capability's properties based on the provided partial body.\n\n- **name**: Optional new name for the capability.\n- **base_prompt**: Optional new base prompt for the capability.\n- **operation**: Determines how to handle capabilities:\n    - `overwrite`: Replace existing capabilities with the provided list.\n    - `append`: Add the provided capabilities to the existing ones.\n    - `remove`: Remove the provided capabilities from the existing ones.","operationId":"update_task_tasks__task_id__put","parameters":[{"name":"task_id","in":"path","required":true,"schema":{"type":"string","title":"Task Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/NodeUpdate"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Task"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"delete":{"tags":["Tasks"],"summary":"Delete Task","operationId":"delete_task_tasks__task_id__delete","parameters":[{"name":"task_id","in":"path","required":true,"schema":{"type":"string","title":"Task Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/neo4j/stats":{"get":{"tags":["Neo4j"],"summary":"Get Database Stats","description":"Retrieve basic statistics about the Neo4j database.","operationId":"get_database_stats_neo4j_stats_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}},"/neo4j/health":{"get":{"tags":["Neo4j"],"summary":"Health Check","description":"Check the health of the Neo4j database connection.","operationId":"health_check_neo4j_health_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}},"/neo4j/query":{"post":{"tags":["Neo4j"],"summary":"Run Custom Query","description":"Execute a custom Cypher query against the Neo4j database.","operationId":"run_custom_query_neo4j_query_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CypherQuery"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/neo4j/relationships":{"post":{"tags":["Neo4j"],"summary":"Create Relationship","description":"Create a relationship between two nodes in Neo4j.","operationId":"create_relationship_neo4j_relationships_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Relationship"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/neo4j/relationships/{node_label}/{node_id}":{"get":{"tags":["Neo4j"],"summary":"Get Relationships","description":"Retrieve all relationships for a given node.","operationId":"get_relationships_neo4j_relationships__node_label___node_id__get","parameters":[{"name":"node_label","in":"path","required":true,"schema":{"type":"string","title":"Node Label"}},{"name":"node_id","in":"path","required":true,"schema":{"type":"string","title":"Node Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/agents/":{"get":{"tags":["Agents"],"summary":"Get Agents","description":"Get all agents.","operationId":"get_agents_agents__get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"items":{"$ref":"#/components/schemas/Agent"},"type":"array","title":"Response Get Agents Agents  Get"}}}}}},"post":{"tags":["Agents"],"summary":"Create Agent","description":"Create a new agent.","operationId":"create_agent_agents__post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Agent"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Agent"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/agents/{agent_id}":{"get":{"tags":["Agents"],"summary":"Get Agent","description":"Get an agent by ID.","operationId":"get_agent_agents__agent_id__get","parameters":[{"name":"agent_id","in":"path","required":true,"schema":{"type":"string","title":"Agent Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Agent"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"put":{"tags":["Agents"],"summary":"Update Agent","description":"Update an agent's properties based on the provided partial body.\n\n- **name**: Optional new name for the agent.\n- **base_prompt**: Optional new base prompt for the agent.\n- **capabilities**: List of capabilities to modify.\n- **operation**: Determines how to handle capabilities:\n    - `overwrite`: Replace existing capabilities with the provided list.\n    - `append`: Add the provided capabilities to the existing ones.\n    - `remove`: Remove the provided capabilities from the existing ones.","operationId":"update_agent_agents__agent_id__put","parameters":[{"name":"agent_id","in":"path","required":true,"schema":{"type":"string","title":"Agent Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/NodeUpdate"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Agent"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"delete":{"tags":["Agents"],"summary":"Delete Agent","operationId":"delete_agent_agents__agent_id__delete","parameters":[{"name":"agent_id","in":"path","required":true,"schema":{"type":"string","title":"Agent Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"type":"object","title":"Response Delete Agent Agents  Agent Id  Delete"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/capabilities/":{"get":{"tags":["Capabilities"],"summary":"List Capabilities","operationId":"list_capabilities_capabilities__get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"items":{"$ref":"#/components/schemas/Capability"},"type":"array","title":"Response List Capabilities Capabilities  Get"}}}}}},"post":{"tags":["Capabilities"],"summary":"Create Capability","operationId":"create_capability_capabilities__post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Capability"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Capability"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/capabilities/{id}":{"get":{"tags":["Capabilities"],"summary":"Get Capability","description":"Get a capability by ID.","operationId":"get_capability_capabilities__id__get","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","title":"Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Capability"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"put":{"tags":["Capabilities"],"summary":"Update Capability","description":"Update an capability's properties based on the provided partial body.\n\n- **name**: Optional new name for the capability.\n- **base_prompt**: Optional new base prompt for the capability.\n- **operation**: Determines how to handle capabilities:\n    - `overwrite`: Replace existing capabilities with the provided list.\n    - `append`: Add the provided capabilities to the existing ones.\n    - `remove`: Remove the provided capabilities from the existing ones.","operationId":"update_capability_capabilities__id__put","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","title":"Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/NodeUpdate"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Capability"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"delete":{"tags":["Capabilities"],"summary":"Delete Capability","operationId":"delete_capability_capabilities__id__delete","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","title":"Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"type":"object","title":"Response Delete Capability Capabilities  Id  Delete"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/":{"get":{"summary":"Read Root","operationId":"read_root__get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}}},"components":{"schemas":{"Agent":{"properties":{"id":{"type":"string","title":"Id"},"description":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Description"},"name":{"type":"string","title":"Name"},"capabilities":{"items":{"type":"string"},"type":"array","title":"Capabilities","default":[]},"base_prompt":{"type":"string","title":"Base Prompt","default":"You are an agent"}},"additionalProperties":true,"type":"object","required":["id","name"],"title":"Agent"},"Capability":{"properties":{"id":{"type":"string","title":"Id"},"description":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Description"},"name":{"type":"string","title":"Name"}},"additionalProperties":true,"type":"object","required":["id","name"],"title":"Capability"},"CypherQuery":{"properties":{"query":{"type":"string","title":"Query"},"parameters":{"type":"object","title":"Parameters","default":{}}},"type":"object","required":["query"],"title":"CypherQuery"},"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"NodeUpdate":{"properties":{"updates":{"additionalProperties":{"anyOf":[{"type":"string"},{"type":"null"}]},"type":"object","title":"Updates"},"operation":{"type":"string","enum":["overwrite","append","remove"],"title":"Operation","default":"overwrite"}},"type":"object","required":["updates"],"title":"NodeUpdate"},"Relationship":{"properties":{"start_node_label":{"type":"string","title":"Start Node Label"},"start_node_id":{"type":"string","title":"Start Node Id"},"end_node_label":{"type":"string","title":"End Node Label"},"end_node_id":{"type":"string","title":"End Node Id"},"relationship_type":{"type":"string","title":"Relationship Type"}},"type":"object","required":["start_node_label","start_node_id","end_node_label","end_node_id","relationship_type"],"title":"Relationship"},"Task":{"properties":{"id":{"type":"string","title":"Id"},"description":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Description"},"status":{"type":"string","title":"Status","default":"UNASSIGNED"}},"additionalProperties":true,"type":"object","required":["id"],"title":"Task"},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"}}}}
+{
+  "openapi": "3.1.0",
+  "info": { "title": "FastAPI", "version": "0.1.0" },
+  "paths": {
+    "/metrics": {
+      "get": {
+        "summary": "Metrics",
+        "description": "Endpoint that serves Prometheus metrics.",
+        "operationId": "metrics_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/tasks/": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "Get Tasks",
+        "operationId": "get_tasks_tasks__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/Task" },
+                  "type": "array",
+                  "title": "Response Get Tasks Tasks  Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "Create Task",
+        "operationId": "create_task_tasks__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Task" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{task_id}": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "Get Task",
+        "description": "Get a specific task by ID.",
+        "operationId": "get_task_tasks__task_id__get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Task Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Tasks"],
+        "summary": "Update Task",
+        "description": "Update an capability's properties based on the provided partial body.\n\n- **name**: Optional new name for the capability.\n- **base_prompt**: Optional new base prompt for the capability.\n- **operation**: Determines how to handle capabilities:\n    - `overwrite`: Replace existing capabilities with the provided list.\n    - `append`: Add the provided capabilities to the existing ones.\n    - `remove`: Remove the provided capabilities from the existing ones.",
+        "operationId": "update_task_tasks__task_id__put",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Task Id" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NodeUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tasks"],
+        "summary": "Delete Task",
+        "operationId": "delete_task_tasks__task_id__delete",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Task Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/neo4j/stats": {
+      "get": {
+        "tags": ["Neo4j"],
+        "summary": "Get Database Stats",
+        "description": "Retrieve basic statistics about the Neo4j database.",
+        "operationId": "get_database_stats_neo4j_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/neo4j/health": {
+      "get": {
+        "tags": ["Neo4j"],
+        "summary": "Health Check",
+        "description": "Check the health of the Neo4j database connection.",
+        "operationId": "health_check_neo4j_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/neo4j/query": {
+      "post": {
+        "tags": ["Neo4j"],
+        "summary": "Run Custom Query",
+        "description": "Execute a custom Cypher query against the Neo4j database.",
+        "operationId": "run_custom_query_neo4j_query_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CypherQuery" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/neo4j/relationships": {
+      "post": {
+        "tags": ["Neo4j"],
+        "summary": "Create Relationship",
+        "description": "Create a relationship between two nodes in Neo4j.",
+        "operationId": "create_relationship_neo4j_relationships_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Relationship" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/neo4j/relationships/{node_label}/{node_id}": {
+      "get": {
+        "tags": ["Neo4j"],
+        "summary": "Get Relationships",
+        "description": "Retrieve all relationships for a given node.",
+        "operationId": "get_relationships_neo4j_relationships__node_label___node_id__get",
+        "parameters": [
+          {
+            "name": "node_label",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Node Label" }
+          },
+          {
+            "name": "node_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Node Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agents/": {
+      "get": {
+        "tags": ["Agents"],
+        "summary": "Get Agents",
+        "description": "Get all agents.",
+        "operationId": "get_agents_agents__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/Agent" },
+                  "type": "array",
+                  "title": "Response Get Agents Agents  Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Agents"],
+        "summary": "Create Agent",
+        "description": "Create a new agent.",
+        "operationId": "create_agent_agents__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Agent" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Agent" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agents/{agent_id}": {
+      "get": {
+        "tags": ["Agents"],
+        "summary": "Get Agent",
+        "description": "Get an agent by ID.",
+        "operationId": "get_agent_agents__agent_id__get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Agent Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Agent" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Agents"],
+        "summary": "Update Agent",
+        "description": "Update an agent's properties based on the provided partial body.\n\n- **name**: Optional new name for the agent.\n- **base_prompt**: Optional new base prompt for the agent.\n- **capabilities**: List of capabilities to modify.\n- **operation**: Determines how to handle capabilities:\n    - `overwrite`: Replace existing capabilities with the provided list.\n    - `append`: Add the provided capabilities to the existing ones.\n    - `remove`: Remove the provided capabilities from the existing ones.",
+        "operationId": "update_agent_agents__agent_id__put",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Agent Id" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NodeUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Agent" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Agents"],
+        "summary": "Delete Agent",
+        "operationId": "delete_agent_agents__agent_id__delete",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Agent Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Delete Agent Agents  Agent Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/capabilities/": {
+      "get": {
+        "tags": ["Capabilities"],
+        "summary": "List Capabilities",
+        "operationId": "list_capabilities_capabilities__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/Capability" },
+                  "type": "array",
+                  "title": "Response List Capabilities Capabilities  Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Capabilities"],
+        "summary": "Create Capability",
+        "operationId": "create_capability_capabilities__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Capability" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Capability" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/capabilities/{id}": {
+      "get": {
+        "tags": ["Capabilities"],
+        "summary": "Get Capability",
+        "description": "Get a capability by ID.",
+        "operationId": "get_capability_capabilities__id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Capability" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Capabilities"],
+        "summary": "Update Capability",
+        "description": "Update an capability's properties based on the provided partial body.\n\n- **name**: Optional new name for the capability.\n- **base_prompt**: Optional new base prompt for the capability.\n- **operation**: Determines how to handle capabilities:\n    - `overwrite`: Replace existing capabilities with the provided list.\n    - `append`: Add the provided capabilities to the existing ones.\n    - `remove`: Remove the provided capabilities from the existing ones.",
+        "operationId": "update_capability_capabilities__id__put",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Id" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NodeUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Capability" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Capabilities"],
+        "summary": "Delete Capability",
+        "operationId": "delete_capability_capabilities__id__delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Delete Capability Capabilities  Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Read Root",
+        "operationId": "read_root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Agent": {
+        "properties": {
+          "id": { "type": "string", "title": "Id" },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "name": { "type": "string", "title": "Name" },
+          "capabilities": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Capabilities",
+            "default": []
+          },
+          "base_prompt": {
+            "type": "string",
+            "title": "Base Prompt",
+            "default": "You are an agent"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": ["id", "name"],
+        "title": "Agent"
+      },
+      "Capability": {
+        "properties": {
+          "id": { "type": "string", "title": "Id" },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "name": { "type": "string", "title": "Name" }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": ["id", "name"],
+        "title": "Capability"
+      },
+      "CypherQuery": {
+        "properties": {
+          "query": { "type": "string", "title": "Query" },
+          "parameters": {
+            "type": "object",
+            "title": "Parameters",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": ["query"],
+        "title": "CypherQuery"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "NodeUpdate": {
+        "properties": {
+          "updates": {
+            "additionalProperties": {
+              "anyOf": [{ "type": "string" }, { "type": "null" }]
+            },
+            "type": "object",
+            "title": "Updates"
+          },
+          "operation": {
+            "type": "string",
+            "enum": ["overwrite", "append", "remove"],
+            "title": "Operation",
+            "default": "overwrite"
+          }
+        },
+        "type": "object",
+        "required": ["updates"],
+        "title": "NodeUpdate"
+      },
+      "Relationship": {
+        "properties": {
+          "start_node_label": { "type": "string", "title": "Start Node Label" },
+          "start_node_id": { "type": "string", "title": "Start Node Id" },
+          "end_node_label": { "type": "string", "title": "End Node Label" },
+          "end_node_id": { "type": "string", "title": "End Node Id" },
+          "relationship_type": {
+            "type": "string",
+            "title": "Relationship Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_node_label",
+          "start_node_id",
+          "end_node_label",
+          "end_node_id",
+          "relationship_type"
+        ],
+        "title": "Relationship"
+      },
+      "Task": {
+        "properties": {
+          "id": { "type": "string", "title": "Id" },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "UNASSIGNED"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": ["id"],
+        "title": "Task"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

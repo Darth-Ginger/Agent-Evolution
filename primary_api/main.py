@@ -4,7 +4,19 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from .routes import tasks, neo4j, agents, capabilities
 
-app = FastAPI()
+DEBUG: bool = True
+
+app = FastAPI(title="Primary API", 
+              version="0.1.0",
+              openapi_tags=[
+                  {"name": "Tasks"},
+                  {"name": "Neo4j"},
+                  {"name": "Agents"},
+                  {"name": "Capabilities"}
+              ],
+              openapi_url="/openapi.json",
+              servers=[{"url": "http://10.20.0.40:8100"}],
+              debug=DEBUG)
 
 # Register Prometheus Instrumentator
 Instrumentator().instrument(app).expose(app)
@@ -24,4 +36,5 @@ async def download_openapi():
     """
     Download the OpenAPI specification.
     """
+    
     return JSONResponse(app.openapi())
