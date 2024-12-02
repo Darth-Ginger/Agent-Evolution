@@ -1,6 +1,7 @@
 from typing import Dict
 
 from ..models.models import NodeBase
+from .neo4j import get_neo4j_driver, node_exists
 
 class NodeManager:
     def __init__(self, driver):
@@ -77,3 +78,43 @@ class NodeManager:
         with self.driver.session() as session:
             results = session.run(f"MATCH (n:{node_type}) RETURN n").data()
         return [NodeBase(**record["n"]) for record in results]
+    
+    def get_nodes(self, node_type: str, property_name: str, property_value: str) -> list[NodeBase]:
+        with self.driver.session() as session:
+            results = session.run(f"MATCH (n:{node_type} {{ {property_name}: $property_value }}) RETURN n", property_value=property_value).data()
+        return [NodeBase(**record["n"]) for record in results]
+    
+    def get_nodes(self, property_name: str, property_value: str) -> list[NodeBase]:
+        with self.driver.session() as session:
+            results = session.run(f"MATCH (n {{ {property_name}: $property_value }}) RETURN n", property_value=property_value).data()
+        return [NodeBase(**record["n"]) for record in results]
+    
+    def get_like_nodes(self, node_type: str, property_name: str, property_value: str) -> list[NodeBase]:
+        with self.driver.session() as session:
+            results = session.run(
+                f"""
+                MATCH (n:{node_type})
+                WHERE n.{property_name} CONTAINS $property_value
+                RETURN n
+                """, 
+                property_value=property_value
+            ).data()
+        return [NodeBase(**record["n"]) for record in results]
+    
+    def get_like_nodes(self, property_name: str, property_value: str) -> list[NodeBase]:
+        with self.driver.session() as session:
+            results = session.run(
+                f"""
+                MATCH (n)
+                WHERE n.{property_name} CONTAINS $property_value
+                RETURN n
+                """, 
+                property_value=property_value
+            ).data()
+        return [NodeBase(**record["n"]) for record in results]
+    
+    def node_exists(self, node_type: str, property_name: str, property_value: str) -> bool:
+        return node_exists(node_type, property_name, property_value)
+    
+    def node_exists(self, property_name: str, property_value: str) -> bool:
+        return node_exists(property_name, property_value)
