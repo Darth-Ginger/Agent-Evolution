@@ -1,4 +1,6 @@
 # Ignore files
+.git
+.gitignore
 *.egg
 *.egg-info
 dist
@@ -16,3 +18,4 @@ db.sqlite3-journal
 
 #ssh_keys
 ssh_keys/
+__pycache__/
