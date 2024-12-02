@@ -3,10 +3,10 @@ import re
 from pydantic import BaseModel, Field, model_validator
 from typing import Dict, Literal, Optional
 
-from ..db.neo4j import get_neo4j_driver
-from ..db.NodeManager import NodeManager
+from ..db.neo4j import get_like_nodes, get_neo4j_driver
+# from ..db.NodeManager import NodeManager
 
-Manager = NodeManager(get_neo4j_driver())
+# Manager = NodeManager(get_neo4j_driver())
 
 class CypherQuery(BaseModel):
     query: str
@@ -48,7 +48,7 @@ class NodeBase(BaseModel):
     @staticmethod
     def check_existing_ids(base_id) -> list[str]:
         existing_ids = []
-        for node in Manager.get_like_nodes("id", base_id):
+        for node in get_like_nodes("id", base_id):
             if node["n"]["id"] == base_id:
                 existing_ids.append(node["n"]["id"])
         return existing_ids

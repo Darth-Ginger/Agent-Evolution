@@ -1,5 +1,7 @@
 from neo4j import GraphDatabase
 
+# from ..models.models import NodeBase
+
 def get_neo4j_driver():
     uri = "bolt://neo4j:7687"
     user = "neo4j"
@@ -42,4 +44,14 @@ def node_exists(property_name: str, property_value: str) -> bool:
             result = session.run(query, property_value=property_value).single()
             return result["exists"]
         
-        
+def get_like_nodes(self, node_type: str, property_name: str, property_value: str) -> list[dict]:
+        with self.driver.session() as session:
+            results = session.run(
+                f"""
+                MATCH (n:{node_type})
+                WHERE n.{property_name} CONTAINS $property_value
+                RETURN n
+                """, 
+                property_value=property_value
+            ).data()
+        return [record["n"] for record in results]
